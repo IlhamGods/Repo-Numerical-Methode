@@ -1,0 +1,99 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+// Fungsi untuk mencetak matriks
+void printMatrix(double** matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= n; j++) {
+            cout << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Fungsi untuk menghitung solusi menggunakan metode Gauss-Seidel
+void gaussSeidel(double** matrix, int n, int maxIterations, double tolerance) {
+    double* x = new double[n]; // Solusi iteratif
+    double* newX = new double[n]; // Solusi baru
+
+    // Inisialisasi solusi awal
+    for (int i = 0; i < n; i++) {
+        x[i] = 0;
+    }
+
+    int iteration = 0;
+    double error = tolerance + 1; // Inisialisasi error lebih besar dari tolerance
+
+    while (iteration < maxIterations && error > tolerance) {
+        for (int i = 0; i < n; i++) {
+            newX[i] = matrix[i][n]; // Menginisialisasi dengan nilai konstanta
+            for (int j = 0; j < n; j++) {
+                if (j != i) {
+                    newX[i] -= matrix[i][j] * x[j];
+                }
+            }
+            newX[i] /= matrix[i][i];
+        }
+
+        // Menghitung error
+        error = 0;
+        for (int i = 0; i < n; i++) {
+            error += fabs(newX[i] - x[i]);
+        }
+
+        // Menyalin solusi baru ke solusi iteratif
+        for (int i = 0; i < n; i++) {
+            x[i] = newX[i];
+        }
+
+        iteration++;
+    }
+
+    // Menampilkan solusi
+    cout << "Solusi setelah " << iteration << " iterasi:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "x" << i + 1 << " = " << x[i] << endl;
+    }
+
+    delete[] x;
+    delete[] newX;
+}
+
+int main() {
+    int n;
+
+    cout << "Masukkan jumlah variabel: ";
+    cin >> n;
+
+    // Matriks augmented [A|B]
+    double** matrix = new double*[n];
+    for (int i = 0; i < n; i++) {
+        matrix[i] = new double[n + 1];
+    }
+
+    // Memasukkan koefisien matriks dan konstanta ke dalam matriks augmented
+    cout << "Masukkan koefisien matriks augmented:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= n; j++) {
+            cout << "A[" << i + 1 << "][" << j + 1 << "] = ";
+            cin >> matrix[i][j];
+        }
+    }
+
+    // Menampilkan matriks augmented
+    cout << "Matriks augmented:" << endl;
+    printMatrix(matrix, n);
+
+    // Memanggil fungsi Gauss-Seidel
+    gaussSeidel(matrix, n, 100, 1e-6);
+
+    // Menghapus matriks dari heap
+    for (int i = 0; i < n; i++) {
+        delete[] matrix[i];
+    }
+    delete[] matrix;
+
+    return 0;
+}
